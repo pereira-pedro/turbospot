@@ -13,7 +13,6 @@
 #
 # Table structure for table 'radacct'
 #
-
 CREATE TABLE radacct (
   radacctid bigint(21) NOT NULL auto_increment,
   acctsessionid varchar(64) NOT NULL default '',
@@ -146,4 +145,17 @@ CREATE TABLE nas (
   description varchar(200) DEFAULT 'RADIUS Client',
   PRIMARY KEY (id),
   KEY nasname (nasname)
+);
+
+#
+# Auxiliary table to node interface
+#
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fullname` varchar(64) NOT NULL,
+  `login` varchar(16) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `type` varchar(16) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `login_UNIQUE` (`login`)
 );

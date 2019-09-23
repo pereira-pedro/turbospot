@@ -170,7 +170,7 @@
      #  authenticate via EAP-TLS!  This is likely not what you want.
      tls-config tls-common {
              #private_key_password = whatever
-             private_key_file = /etc/raddb/radius.acme.com.key
+             private_key_file = /etc/raddb/star.ucdb.br.key
  
              #  If Private key & Certificate are located in
              #  the same file, then private_key_file &
@@ -182,7 +182,7 @@
              #  only the server certificate, but ALSO all
              #  of the CA certificates used to sign the
              #  server certificate.
-             certificate_file = /etc/raddb/radius.acme.com.crt
+             certificate_file = /etc/raddb/star.ucdb.br.crt
  
              #  Trusted Root CA list
              #
@@ -194,7 +194,7 @@
              #  In that case, this CA file should contain
              #  *one* CA certificate.
              #
-             ca_file = /etc/raddb/ca.crt
+             ca_file = /etc/raddb/ca-bundle.crt
  
              #  OpenSSL will automatically create certificate chains,
              #  unless we tell it to not do that.  The problem is that

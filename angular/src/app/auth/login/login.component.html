@@ -1,0 +1,37 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Entrar no sistema</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form [formGroup]="form" (submit)="onLogin()" *ngIf="!isLoading">
+      <div class="login-container">
+        <mat-form-field hintLabel="Use apenas números e letras sem acentos.">
+          <input
+            matInput
+            type="text"
+            formControlName="login"
+            placeholder="Login do usuário"
+          />
+          <mat-error *ngIf="form.get('login').invalid"
+            >Entre com o login do usuário.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            placeholder="Senha do usuário"
+          />
+          <mat-error *ngIf="form.get('password').invalid"
+            >Entre com o senha do usuário.</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <button mat-raised-button color="accent" type="submit">
+        Entrar
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,5 +1,5 @@
-from alpine:latest
-LABEL maintainer="albertoscola221@gmail.com"
+FROM alpine:latest
+LABEL maintainer="petrivs@gmail.com"
 
 RUN apk update && \
 	apk add freeradius nano openssl freeradius-mysql shadow rsyslog freeradius-eap && \
@@ -9,6 +9,7 @@ ARG DB_VLAN1
 ARG RADIUS_USR_PASSWORD
 ARG REALM
 ARG RADIUS_SECRET
+ARG PROJECT_DOMAIN
 
 COPY ./raddb/radiusd.conf /etc/raddb/radiusd.conf
 COPY ./raddb/default /etc/raddb/sites-available/default
@@ -28,6 +29,7 @@ COPY ./raddb/rsyslog.conf /etc/rsyslog.conf
 
 
 RUN sed -i -e 's@RADIUS_USR_PASSWORD@'${RADIUS_USR_PASSWORD}'@g' /etc/raddb/mods-available/sql && \
+	sed -i -e 's@PROJECT_DOMAIN@'${PROJECT_DOMAIN}'@g' /etc/raddb/mods-available/sql && \
 	sed -i -e 's@DB_VLAN1@'${DB_VLAN1}'@g' /etc/raddb/mods-available/sql && \
 	sed -i -e 's@REALM@'${REALM}'@g' /etc/raddb/proxy.conf && \
 	sed -i -e 's@RADIUS_SECRET@'${RADIUS_SECRET}'@g' /etc/raddb/clients.conf
@@ -38,7 +40,7 @@ RUN chmod 750 /start.sh && \
 	usermod -u 1000 radius && \
  	groupmod -g 1000 radius && \
  	chown radius:radius -R /var/log/radius /etc/raddb && \
- 	echo "${DB_VLAN1}		mysql.acme.com" >> /etc/hosts
+ 	echo "${DB_VLAN1}		mysql.${PROJECT_DOMAIN}" >> /etc/hosts
 
 
 ENTRYPOINT ["/start.sh"]

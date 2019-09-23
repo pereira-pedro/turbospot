@@ -1,36 +1,9 @@
-# Docker-Compose file for Stockholm Network
-version: '3'
+version: "3"
 
 services:
-  radius_server:
-    container_name: ${COMPOSE_PROJECT_NAME}_radius
-    hostname: radius.acme.com
-    restart: always
-    build:
-      context: ./radius
-      args:
-        - DB_VLAN1=${DB_VLAN1}
-        - RADIUS_USR_PASSWORD=${RADIUS_USR_PASSWORD}
-        - REALM=${RADIUS_REALM}
-        - RADIUS_SECRET=${RADIUS_SECRET}
-    networks:
-      sto_vlan1:
-        ipv4_address: ${RADIUS_VLAN1}
-    ports:
-      - "1812:1812/udp"
-      - "1813:1813/udp"
-    volumes:
-      - ./radius/logs:/var/log/radius
-      - "/etc/timezone:/etc/timezone:ro"
-      - "/etc/localtime:/etc/localtime:ro"
-    links:
-      - mysql_db:database
-    depends_on:
-      - "mysql_db"
-
-  mysql_db:
+  mysql_server:
     container_name: ${COMPOSE_PROJECT_NAME}_mysql
-    hostname: mysql.acme.com
+    hostname: mysql.${PROJECT_DOMAIN}
     restart: always
     build:
       context: ./mysql
@@ -42,6 +15,7 @@ services:
         - MYSQL_LOG_DIR=${MYSQL_LOG_DIR}
         - RADIUS_USR_PASSWORD=${RADIUS_USR_PASSWORD}
         - RADIUS_VLAN1=${RADIUS_VLAN1}
+        - PROJECT_DOMAIN=${PROJECT_DOMAIN}
     networks:
       sto_vlan1:
         ipv4_address: ${DB_VLAN1}
@@ -59,6 +33,84 @@ services:
       MYSQL_CONTAINER_GROUP: "mysql"
       MYSQL_DATABASE: "radius"
 
+  radius_server:
+    container_name: ${COMPOSE_PROJECT_NAME}_radius
+    hostname: radius.${PROJECT_DOMAIN}
+    restart: always
+    build:
+      context: ./radius
+      args:
+        - DB_VLAN1=${DB_VLAN1}
+        - RADIUS_USR_PASSWORD=${RADIUS_USR_PASSWORD}
+        - REALM=${RADIUS_REALM}
+        - RADIUS_SECRET=${RADIUS_SECRET}
+        - PROJECT_DOMAIN=${PROJECT_DOMAIN}
+    networks:
+      sto_vlan1:
+        ipv4_address: ${RADIUS_VLAN1}
+    ports:
+      - "1812:1812/udp"
+      - "1813:1813/udp"
+    volumes:
+      - ./radius/logs:/var/log/radius
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+    links:
+      - mysql_server:database
+    depends_on:
+      - "mysql_server"
+
+  node_server:
+    container_name: ${COMPOSE_PROJECT_NAME}_node
+    hostname: node.${PROJECT_DOMAIN}
+    restart: always
+    build:
+      context: ./node
+      args:
+        - DB_VLAN1=${DB_VLAN1}
+        - NODE_USR_PASSWORD=${NODE_USR_PASSWORD}
+        - JWT_SALT_KEY=${JWT_SALT_KEY}
+        - PROJECT_DOMAIN=${PROJECT_DOMAIN}
+        - HASH_SALT=${HASH_SALT}
+    networks:
+      sto_vlan1:
+        ipv4_address: ${NODE_VLAN1}
+    ports:
+      - "3000:3000/tcp"
+    #volumes:
+    #  - "/etc/timezone:/etc/timezone:ro"
+    #  - "/etc/localtime:/etc/localtime:ro"
+    links:
+      - mysql_server:database
+    depends_on:
+      - "mysql_server"
+  angular_client:
+    container_name: ${COMPOSE_PROJECT_NAME}_angular
+    hostname: angular.${PROJECT_DOMAIN}
+    restart: always
+    build:
+      context: ./angular
+      args:
+        - NODE_VLAN1=${NODE_VLAN1}
+    networks:
+      sto_vlan1:
+        ipv4_address: ${ANGULAR_VLAN1}
+    ports:
+      - "80:4200/tcp"
+    #volumes:
+    #  - "/etc/timezone:/etc/timezone:ro"
+    #  - "/etc/localtime:/etc/localtime:ro"
+    links:
+      - node_server:node
+    depends_on:
+      - "node_server"
+  certs_generator:
+    build:
+      context: ./certs
+      args:
+        - PROJECT_DOMAIN=${PROJECT_DOMAIN}
+    volumes:
+      - ./certs/data:/certs
 networks:
   sto_vlan1:
     driver: bridge

@@ -1,0 +1,14 @@
+table {
+  width: 100%;
+}
+
+.md-fab-bottom-right{
+  position: fixed !important;
+  right: 30px; /* Add this and change value to set the margin you want */
+  bottom: 30px;
+}
+
+.mat-row:hover {
+  background-color: lightgray;
+  cursor: pointer;
+}

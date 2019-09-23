@@ -1,0 +1,78 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Usuário</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
+    <form [formGroup]="form" (submit)="onSaveUser()" *ngIf="!isLoading" autocomplete="off">
+      <div class="edit-user-container">
+        <mat-form-field hintLabel="Nome completo do usuário.">
+          <input
+            matInput
+            type="text"
+            formControlName="fullname"
+            placeholder="Nome"
+          />
+          <mat-error *ngIf="form.get('fullname').invalid"
+            >Entre com o nome completo do usuário.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field
+          hintLabel="Use apenas números e letras sem acentos."
+        >
+          <input
+            matInput
+            type="text"
+            formControlName="login"
+            placeholder="Login do usuário"
+          />
+          <mat-error *ngIf="form.get('login').invalid"
+            >Entre com o login do usuário.</mat-error
+          >
+        </mat-form-field>
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            placeholder="Senha do usuário"
+            autocomplete="off"
+          />
+          <mat-error *ngIf="form.get('password').invalid"
+            >Entre com o senha do usuário.</mat-error
+          >
+        </mat-form-field>
+
+        <mat-form-field>
+          <input
+            matInput
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirmação da senha"
+            autocomplete="off"
+          />
+          <mat-error *ngIf="form.get('confirmPassword').invalid">
+            A confirmação da senha é inválida.
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Tipo do usuário</mat-label>
+          <mat-select formControlName="type" required>
+            <mat-option *ngFor="let type of userTypes" [value]="type.value">
+              {{ type.viewValue }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('type').invalid"
+            >Tipo de usuário inválido.</mat-error
+          >
+        </mat-form-field>
+      </div>
+      <button mat-raised-button color="accent" type="submit">
+        Grava
+      </button>
+      <button type="button" mat-button color="warn" (click)="onDelete()">
+        Remove
+      </button>
+    </form>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,10 @@
+{
+  "env": {
+    "DB_HOST": "DB_VLAN1",
+    "DB_USER": "radius",
+    "DB_PASSWORD": "RADIUS_USR_PASSWORD",
+    "DB_NAME": "radius",
+    "DB_PORT": "3306",
+    "JWT_KEY": "JWT_SALT_KEY"
+  }
+}

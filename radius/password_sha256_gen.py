@@ -15,7 +15,7 @@ def hashPassword(password, salt):
 	print("\nattribute: SSHA2-256-Password")
 	print("NB: save in the DB without {..}\n")
 
-	print("sha256 + salt = " + str(ctx.hexdigest() + str(salt)))
+	print("sha256 + salt = " + str(ctx.hexdigest() + " " + str(salt)))
 	print("hashed_password = " + str(hash_clean))
 
 	return hash_clean
@@ -32,5 +32,5 @@ def checkPassword(challenge_password, password):
 	print("Password is correct? " + str(hashed_password.digest() == digest))
 	return hashed_password.digest() == digest
 
-hash = hashPassword(b"test", b"saltsaltsalt")
-checkPassword(hash, b"test")
+hash = hashPassword(b"admin123", b"4xZ3HthnaY5d")
+checkPassword(hash, b"admin123")

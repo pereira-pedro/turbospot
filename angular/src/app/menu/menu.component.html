@@ -1,0 +1,18 @@
+<mat-toolbar color="primary">
+  <mat-toolbar-row>
+    <span>Turbo Spot Users</span>
+    <span class="top-menu-spacer"></span>
+    <mat-icon
+      class="top-menu-icon"
+      [matMenuTriggerFor]="menuSetup"
+      aria-hidden="false"
+      aria-label="Setup icon"
+      *ngIf="userIsAuthenticated"
+      >menu</mat-icon
+    >
+    <mat-menu #menuSetup="matMenu">
+      <button mat-menu-item (click)="onListUsers()" *ngIf="userIsAuthenticated">Usuários</button>
+      <button mat-menu-item (click)="onLogout()" *ngIf="userIsAuthenticated">Encerrar {{userFullname}}</button>
+    </mat-menu>
+  </mat-toolbar-row>
+</mat-toolbar>

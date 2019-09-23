@@ -1,0 +1,40 @@
+<div class="mat-elevation-z8">
+  <button mat-fab class="md-fab-bottom-right" color="accent" aria-label="Adicionar usuário." (click)="onAddUser()">
+    <mat-icon>add</mat-icon>
+  </button>
+
+  <mat-table [dataSource]="users" class="mat-elevation-z6">
+    <!-- Name Column -->
+    <ng-container matColumnDef="fullname">
+      <mat-header-cell *matHeaderCellDef> Nome Completo </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{ row.fullname }} </mat-cell>
+    </ng-container>
+
+    <!-- Login Column -->
+    <ng-container matColumnDef="login">
+      <mat-header-cell *matHeaderCellDef> Login </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{ row.login }} </mat-cell>
+    </ng-container>
+
+    <!-- Type Column -->
+    <ng-container matColumnDef="type">
+      <mat-header-cell *matHeaderCellDef> Tipo </mat-header-cell>
+      <mat-cell *matCellDef="let row"> {{ row.type }} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns" (click)="onEditUser(row.login)"></mat-row>
+  </mat-table>
+</div>
+<br/>
+<mat-paginator
+  [length]="totalUsers"
+  [pageSize]="usersPerPage"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onChangedPage($event)"
+  *ngIf="users.length > 0"
+>
+</mat-paginator>
+<p class="info-text mat-body-1" *ngIf="users.length <= 0 && !isLoading">
+  Não há nenhum usuário inserido.
+</p>
