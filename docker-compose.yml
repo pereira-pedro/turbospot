@@ -84,6 +84,7 @@ services:
       - mysql_server:database
     depends_on:
       - "mysql_server"
+
   angular_client:
     container_name: ${COMPOSE_PROJECT_NAME}_angular
     hostname: angular.${PROJECT_DOMAIN}
@@ -104,6 +105,7 @@ services:
       - node_server:node
     depends_on:
       - "node_server"
+
   certs_generator:
     build:
       context: ./certs
@@ -111,6 +113,7 @@ services:
         - PROJECT_DOMAIN=${PROJECT_DOMAIN}
     volumes:
       - ./certs/data:/certs
+      
 networks:
   sto_vlan1:
     driver: bridge
