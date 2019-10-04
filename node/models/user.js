@@ -3,7 +3,8 @@ const utils = require("../utils");
 
 var User = {
   create: function(User, callback) {
-    const hashPassword = utils.hashedPassword(password);
+    const hashPassword = utils.hashedPassword(User.password);
+    console.log("Password: " + hashPassword)
       return conn.query(
       "CALL sp_create_user(?,?,?,?,@id); SELECT @id AS id",
       [User.fullname, User.login, hashPassword, User.type],

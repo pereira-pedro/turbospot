@@ -8,23 +8,21 @@ services:
     build:
       context: ./mysql
       args:
-        - DB_VLAN1=${DB_VLAN1}
         - MYSQL_CONTAINER_USER=mysql
         - MYSQL_CONTAINER_GROUP=mysql
         - MYSQL_DATA_DIR=${MYSQL_DATA_DIR}
         - MYSQL_LOG_DIR=${MYSQL_LOG_DIR}
         - RADIUS_USR_PASSWORD=${RADIUS_USR_PASSWORD}
         - RADIUS_VLAN1=${RADIUS_VLAN1}
+        - NODE_VLAN1=${NODE_VLAN1}
         - PROJECT_DOMAIN=${PROJECT_DOMAIN}
+        - NODE_USR_PASSWORD=${NODE_USR_PASSWORD}
     networks:
       sto_vlan1:
         ipv4_address: ${DB_VLAN1}
     volumes:
       - ./mysql/data:${MYSQL_DATA_DIR}
       - ./mysql/log/:${MYSQL_LOG_DIR}
-      # TODO FIX LOCALTIME IN MYSQL CONTAINER
-      #- "/etc/timezone:/etc/timezone:ro"
-      #- "/etc/localtime:/etc/localtime:ro"
     ports:
       - "3306:3306"
     environment:
@@ -32,6 +30,7 @@ services:
       MYSQL_CONTAINER_USER: "mysql"
       MYSQL_CONTAINER_GROUP: "mysql"
       MYSQL_DATABASE: "radius"
+#      TZ: ${CONTAINER_TIMEZONE}
 
   radius_server:
     container_name: ${COMPOSE_PROJECT_NAME}_radius
@@ -92,7 +91,7 @@ services:
     build:
       context: ./angular
       args:
-        - NODE_VLAN1=${NODE_VLAN1}
+        - NODE_ADDRESS=${NODE_ADDRESS}
     networks:
       sto_vlan1:
         ipv4_address: ${ANGULAR_VLAN1}

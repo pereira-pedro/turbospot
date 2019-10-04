@@ -84,6 +84,7 @@ exports.deleteUser = (req, res, next) => {
 exports.execLogin = (req, res, next) => {
   User.execLogin(req.body.login, req.body.password, function(err, rows) {
     if (err) {
+      console.log(err);
       res.status(500).json({
         message: err.sqlMessage || "Unable to login." + err
       });

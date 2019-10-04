@@ -7,19 +7,13 @@ ARG MYSQL_DATA_DIR
 ARG MYSQL_LOG_DIR
 ARG RADIUS_USR_PASSWORD 
 ARG RADIUS_VLAN1
-ARG DB_VLAN1
+ARG NODE_VLAN1
 ARG PROJECT_DOMAIN
-COPY my.cnf /etc/my.cnf
+ARG NODE_USR_PASSWORD 
 
+COPY my.cnf /etc/my.cnf
 COPY sql/*.sql /docker-entrypoint-initdb.d/
 COPY certs/* /mysql-certs/
-
-#RUN usermod -u 1000 ${MYSQL_CONTAINER_USER} && \
-# 	groupmod -g 1000 ${MYSQL_CONTAINER_GROUP} && \
-	#chown ${MYSQL_CONTAINER_USER}:${MYSQL_CONTAINER_USER} -R ${MYSQL_DATA_DIR}  /docker-entrypoint-initdb.d && \
-	#sed -i -e 's@RADIUS_USR_PASSWORD@'${RADIUS_USR_PASSWORD}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
-	#sed -i -e 's@RADIUS_VLAN1@'${RADIUS_VLAN1}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
-	#chown ${MYSQL_CONTAINER_USER}:${MYSQL_CONTAINER_USER} -R /mysql-certs/ 
 
 RUN [ -d ${MYSQL_LOG_DIR} ] || mkdir ${MYSQL_LOG_DIR} && \
 	chown ${MYSQL_CONTAINER_USER}:${MYSQL_CONTAINER_GROUP} -R ${MYSQL_LOG_DIR} && \
@@ -29,6 +23,8 @@ RUN [ -d ${MYSQL_LOG_DIR} ] || mkdir ${MYSQL_LOG_DIR} && \
 	sed -i -e 's@RADIUS_USR_PASSWORD@'${RADIUS_USR_PASSWORD}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
 	sed -i -e 's@PROJECT_DOMAIN@'${PROJECT_DOMAIN}'@g' /etc/my.cnf && \
 	sed -i -e 's@RADIUS_VLAN1@'${RADIUS_VLAN1}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
+	sed -i -e 's@NODE_VLAN1@'${NODE_VLAN1}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
+	sed -i -e 's@NODE_USR_PASSWORD@'${NODE_USR_PASSWORD}'@g' /docker-entrypoint-initdb.d/radius_setup.sql && \
 	chown ${MYSQL_CONTAINER_USER}:${MYSQL_CONTAINER_USER} -R /mysql-certs/ 
 
 EXPOSE 3306

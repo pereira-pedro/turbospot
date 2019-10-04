@@ -35,4 +35,4 @@ GRANT ALL on radius.radpostauth TO 'radius'@'RADIUS_VLAN1';
 
 FLUSH PRIVILEGES;
 
-INSERT INTO radius.user(fullname, login, password, type) VALUES ('Administrator','admin','26a4b135d474253c6bfba9eff93135e20ac3d4cb','admin')
+INSERT INTO radius.user(fullname, login, password, type) VALUES ('Administrator','admin','3NV7B+2Xi9hqaPm89sJpkwfIE4rrkSxEm3F9Uk25H600eFozSHRobmFZNWQ=','admin')

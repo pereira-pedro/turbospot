@@ -150,12 +150,132 @@ CREATE TABLE nas (
 #
 # Auxiliary table to node interface
 #
-CREATE TABLE `user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fullname` varchar(64) NOT NULL,
-  `login` varchar(16) NOT NULL,
-  `password` varchar(64) NOT NULL,
-  `type` varchar(16) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `login_UNIQUE` (`login`)
+CREATE TABLE user (
+  id int(11) NOT NULL auto_increment,
+  fullname varchar(64) NOT NULL,
+  login varchar(16) NOT NULL,
+  password varchar(64) NOT NULL,
+  type varchar(16) NOT NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY login_UNIQUE (login)
 );
+
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_change_password`(
+	IN p_id INT,
+    IN p_login VARCHAR(16),
+    IN p_password VARCHAR(64))
+BEGIN
+	START TRANSACTION;
+    
+    -- update radius user password
+	UPDATE radcheck 
+		SET `value` = p_password 
+    WHERE username = p_login 
+		AND attribute = 'SSHA2-256-Password'
+		AND op = ':=';
+    
+    -- update user password
+    UPDATE user 
+		SET `password` = p_password
+	WHERE login = p_login 
+		AND id = p_id;
+    
+    COMMIT;
+
+END ;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_create_user`(
+	IN p_fullname VARCHAR(32),
+    IN p_login VARCHAR(16),
+    IN p_password VARCHAR(64),
+    IN p_type VARCHAR(16),
+    OUT p_id INT)
+BEGIN
+	START TRANSACTION;
+    
+    -- insert radius user
+	INSERT INTO radcheck (username, attribute, op, `value`)
+    VALUES (p_login, 'SSHA2-256-Password', ':=', p_password);
+    
+    -- insert user admin
+    INSERT INTO user (fullname, login, `password`, `type`)
+    VALUES (p_fullname, p_login, p_password, p_type );
+
+	-- get last inserted id
+	SET p_id = LAST_INSERT_ID();
+    
+    COMMIT;
+
+END ;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_delete_user`(
+	IN p_id INT)
+BEGIN
+    DECLARE v_login VARCHAR(16);
+	DECLARE CONTINUE HANDLER FOR NOT FOUND
+    BEGIN
+		ROLLBACK;
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User not found.';
+    END;
+
+	START TRANSACTION;    
+    
+    -- find current login
+    SELECT login 
+    INTO v_login
+    FROM user
+    WHERE id = p_id;
+    
+    -- delete radius user
+	DELETE FROM radcheck
+    WHERE username = v_login;
+    
+    -- insert user admin
+    DELETE FROM `user`
+    WHERE id = p_id;
+
+    COMMIT;
+
+END ;;
+DELIMITER ;
+
+DELIMITER ;;
+CREATE DEFINER=`root`@`%` PROCEDURE `sp_update_user`(
+	IN p_id INT,
+    IN p_fullname VARCHAR(32),
+    IN p_login VARCHAR(16),
+    IN p_type VARCHAR(16),
+    IN p_password VARCHAR(64)
+    )
+BEGIN
+	START TRANSACTION;
+    
+    -- update user admin
+    UPDATE `user` SET 
+		fullname = p_fullname, 
+        login = p_login, 
+        `type` = p_type
+	WHERE id = p_id;
+
+    -- update radius user
+	UPDATE radcheck SET username = p_login
+    WHERE username = p_login;
+
+    -- update past connections
+  	UPDATE radacct SET username = p_login
+    WHERE username = p_login;
+    
+    -- update password if it's not empty
+    IF LENGTH(p_password) > 0 THEN
+		CALL sp_change_password(p_id, p_login, p_password);
+	END IF;
+
+    COMMIT;
+
+END ;;
+DELIMITER ;
